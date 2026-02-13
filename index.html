@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ホテルポイント最適化シミュレーター | 3チェーン横断比較</title>
+  <meta name="description" content="マリオット・ヒルトン・ハイアットの3チェーン横断で、ポイント宿泊のお得度をランキング比較。ステータス特典を加味した最適なホテル選びをサポート。">
+  <meta property="og:title" content="ホテルポイント最適化シミュレーター">
+  <meta property="og:description" content="マリオット・ヒルトン・ハイアット 3チェーン横断でポイント宿泊のお得度を比較">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="images/ogp.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ホテルポイント最適化シミュレーター">
+  <meta name="twitter:description" content="3チェーン横断でポイント宿泊のお得度を比較">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --marriott: #1B1464;
+      --hilton: #003B5C;
+      --hyatt: #5C068C;
+      --marriott-light: #2a2090;
+      --hilton-light: #005580;
+      --hyatt-light: #7a0eb8;
+      --bg: #f5f5f7;
+      --card-bg: #ffffff;
+      --text: #1d1d1f;
+      --text-secondary: #6e6e73;
+      --border: #d2d2d7;
+      --accent: #0071e3;
+      --success: #34c759;
+      --gold: #f5a623;
+      --score-high: #34c759;
+      --score-mid: #f5a623;
+      --score-low: #ff6b6b;
+    }
+
+    [data-theme="dark"] {
+      --bg: #1a1a2e;
+      --card-bg: #16213e;
+      --text: #e8e8ed;
+      --text-secondary: #a1a1a6;
+      --border: #3a3a4a;
+      --accent: #2997ff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      padding: 32px 16px 24px;
+      background: linear-gradient(135deg, var(--marriott), var(--hyatt));
+      color: white;
+      position: relative;
+    }
+
+    .header h1 {
+      font-size: 22px;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+
+    .header .subtitle {
+      font-size: 13px;
+      opacity: 0.85;
+      font-weight: 400;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .theme-toggle:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+    /* Sections */
+    .section {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 20px;
+      margin: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-icon {
+      font-size: 20px;
+    }
+
+    /* City Select */
+    .city-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .city-btn {
+      padding: 12px 8px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: var(--card-bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .city-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .city-btn.active {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: white;
+    }
+
+    /* Chain Status Cards */
+    .chain-card {
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .chain-card.marriott { border-left: 4px solid var(--marriott); }
+    .chain-card.hilton { border-left: 4px solid var(--hilton); }
+    .chain-card.hyatt { border-left: 4px solid var(--hyatt); }
+
+    .chain-name {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chain-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .chain-badge.marriott { background: var(--marriott); }
+    .chain-badge.hilton { background: var(--hilton); }
+    .chain-badge.hyatt { background: var(--hyatt); }
+
+    .chain-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .field-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .field-label {
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      min-width: 75px;
+      color: var(--text-secondary);
+    }
+
+    select, input[type="number"] {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      background: var(--card-bg);
+      color: var(--text);
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236e6e73' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+    }
+
+    /* Stay Conditions */
+    .stay-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* Search Button */
+    .search-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--marriott), var(--hyatt));
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
+      margin: 16px;
+      max-width: calc(100% - 32px);
+      display: block;
+    }
+
+    .search-btn:hover {
+      opacity: 0.9;
+    }
+
+    .search-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Results */
+    .results-header {
+      text-align: center;
+      padding: 24px 16px;
+    }
+
+    .results-header h2 {
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .results-header .results-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .chain-filter {
+      display: flex;
+      gap: 8px;
+      padding: 0 16px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 6px 14px;
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      background: var(--card-bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-btn.active {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: white;
+    }
+
+    .filter-btn.marriott.active { background: var(--marriott); border-color: var(--marriott); }
+    .filter-btn.hilton.active { background: var(--hilton); border-color: var(--hilton); }
+    .filter-btn.hyatt.active { background: var(--hyatt); border-color: var(--hyatt); }
+
+    /* Hotel Card */
+    .hotel-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      margin: 12px 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      overflow: hidden;
+      transition: transform 0.15s;
+    }
+
+    .hotel-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+
+    .hotel-card-header {
+      padding: 16px 16px 12px;
+      cursor: pointer;
+    }
+
+    .hotel-rank-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .rank-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 900;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .rank-1 { background: linear-gradient(135deg, #f5a623, #e6930a); }
+    .rank-2 { background: linear-gradient(135deg, #a8a8a8, #8a8a8a); }
+    .rank-3 { background: linear-gradient(135deg, #cd7f32, #a0622a); }
+    .rank-other { background: var(--text-secondary); }
+
+    .hotel-name {
+      font-size: 16px;
+      font-weight: 700;
+      flex: 1;
+    }
+
+    .chain-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      color: white;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .chain-tag.marriott { background: var(--marriott); }
+    .chain-tag.hilton { background: var(--hilton); }
+    .chain-tag.hyatt { background: var(--hyatt); }
+
+    .hotel-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 16px;
+      margin-bottom: 12px;
+    }
+
+    .metric {
+      font-size: 13px;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .metric-icon {
+      font-size: 14px;
+    }
+
+    .metric-value {
+      font-weight: 700;
+    }
+
+    .score-bar-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .score-bar {
+      flex: 1;
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.8s ease-out;
+      width: 0;
+    }
+
+    .score-value {
+      font-size: 18px;
+      font-weight: 900;
+      min-width: 55px;
+      text-align: right;
+    }
+
+    .expand-icon {
+      float: right;
+      font-size: 12px;
+      color: var(--text-secondary);
+      transition: transform 0.2s;
+    }
+
+    .hotel-card.expanded .expand-icon {
+      transform: rotate(180deg);
+    }
+
+    /* Hotel Details */
+    .hotel-details {
+      display: none;
+      padding: 0 16px 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .hotel-card.expanded .hotel-details {
+      display: block;
+    }
+
+    .benefits-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-top: 12px;
+      margin-bottom: 12px;
+    }
+
+    .benefit-item {
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .benefit-check {
+      color: var(--success);
+      font-size: 16px;
+    }
+
+    .benefit-cross {
+      color: var(--score-low);
+      font-size: 16px;
+    }
+
+    .sho-comment {
+      background: linear-gradient(135deg, rgba(92, 6, 140, 0.05), rgba(27, 20, 100, 0.05));
+      border-radius: 10px;
+      padding: 12px;
+      margin: 12px 0;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    [data-theme="dark"] .sho-comment {
+      background: linear-gradient(135deg, rgba(92, 6, 140, 0.15), rgba(27, 20, 100, 0.15));
+    }
+
+    .sho-comment-label {
+      font-weight: 700;
+      font-size: 12px;
+      margin-bottom: 4px;
+      color: var(--hyatt);
+    }
+
+    [data-theme="dark"] .sho-comment-label {
+      color: var(--hyatt-light);
+    }
+
+    .booking-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .booking-link:hover {
+      text-decoration: underline;
+    }
+
+    .points-warning {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      padding: 8px;
+      background: rgba(245, 166, 35, 0.08);
+      border-radius: 8px;
+    }
+
+    [data-theme="dark"] .points-warning {
+      background: rgba(245, 166, 35, 0.12);
+    }
+
+    .not-enough-points {
+      font-size: 12px;
+      color: var(--score-low);
+      font-weight: 500;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Score breakdown */
+    .score-breakdown {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin: 10px 0;
+    }
+
+    .score-detail {
+      text-align: center;
+      padding: 8px;
+      border-radius: 8px;
+      background: var(--bg);
+    }
+
+    .score-detail-label {
+      font-size: 10px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .score-detail-value {
+      font-size: 16px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    /* Tips Section */
+    .tips-section {
+      background: var(--card-bg);
+      border-radius: 16px;
+      margin: 16px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .tips-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .tip-chain {
+      margin-bottom: 12px;
+    }
+
+    .tip-chain-name {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .tip-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Share & Actions */
+    .actions-bar {
+      display: flex;
+      gap: 10px;
+      padding: 16px;
+    }
+
+    .action-btn {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: var(--card-bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .action-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .action-btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text);
+      color: var(--bg);
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 24px 16px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* Disclaimer */
+    .disclaimer {
+      background: rgba(245, 166, 35, 0.08);
+      border-radius: 12px;
+      padding: 14px;
+      margin: 16px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    [data-theme="dark"] .disclaimer {
+      background: rgba(245, 166, 35, 0.12);
+    }
+
+    .disclaimer-title {
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-in {
+      animation: fadeInUp 0.3s ease forwards;
+    }
+
+    /* Screen visibility */
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    /* Responsive */
+    @media (max-width: 400px) {
+      .city-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .hotel-metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .score-breakdown {
+        grid-template-columns: 1fr;
+      }
+
+      .stay-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Loading spinner */
+    .loading {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <button class="theme-toggle" id="themeToggle" aria-label="ダークモード切替">🌙</button>
+    <h1>🏨 ホテルポイント最適化シミュレーター</h1>
+    <p class="subtitle">〜 3チェーン横断で最もお得な1泊を探す 〜</p>
+  </div>
+
+  <!-- Input Screen -->
+  <div class="screen active" id="inputScreen">
+    <div class="container">
+      <!-- City Selection -->
+      <div class="section">
+        <div class="section-title">
+          <span class="section-icon">📍</span>
+          行き先を選択
+        </div>
+        <div class="city-grid" id="cityGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- User Status -->
+      <div class="section">
+        <div class="section-title">
+          <span class="section-icon">👤</span>
+          あなたの情報
+        </div>
+
+        <!-- Marriott -->
+        <div class="chain-card marriott">
+          <div class="chain-name">
+            <span class="chain-badge marriott">Marriott</span>
+            マリオット・ボンヴォイ
+          </div>
+          <div class="chain-fields">
+            <div class="field-row">
+              <span class="field-label">ステータス</span>
+              <select id="marriottStatus">
+                <option value="一般">一般</option>
+                <option value="シルバー">シルバー</option>
+                <option value="ゴールド">ゴールド</option>
+                <option value="プラチナ">プラチナ</option>
+                <option value="チタン" selected>チタン</option>
+                <option value="アンバサダー">アンバサダー</option>
+              </select>
+            </div>
+            <div class="field-row">
+              <span class="field-label">ポイント残高</span>
+              <input type="number" id="marriottPoints" value="150000" min="0" step="1000" placeholder="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- Hilton -->
+        <div class="chain-card hilton">
+          <div class="chain-name">
+            <span class="chain-badge hilton">Hilton</span>
+            ヒルトン・オナーズ
+          </div>
+          <div class="chain-fields">
+            <div class="field-row">
+              <span class="field-label">ステータス</span>
+              <select id="hiltonStatus">
+                <option value="一般">一般</option>
+                <option value="シルバー">シルバー</option>
+                <option value="ゴールド">ゴールド</option>
+                <option value="ダイヤモンド" selected>ダイヤモンド</option>
+              </select>
+            </div>
+            <div class="field-row">
+              <span class="field-label">ポイント残高</span>
+              <input type="number" id="hiltonPoints" value="200000" min="0" step="1000" placeholder="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- Hyatt -->
+        <div class="chain-card hyatt">
+          <div class="chain-name">
+            <span class="chain-badge hyatt">Hyatt</span>
+            ワールドオブハイアット
+          </div>
+          <div class="chain-fields">
+            <div class="field-row">
+              <span class="field-label">ステータス</span>
+              <select id="hyattStatus">
+                <option value="一般">一般</option>
+                <option value="ディスカバリスト">ディスカバリスト</option>
+                <option value="エクスプローリスト">エクスプローリスト</option>
+                <option value="グローバリスト" selected>グローバリスト</option>
+              </select>
+            </div>
+            <div class="field-row">
+              <span class="field-label">ポイント残高</span>
+              <input type="number" id="hyattPoints" value="80000" min="0" step="1000" placeholder="0">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stay Conditions -->
+      <div class="section">
+        <div class="section-title">
+          <span class="section-icon">🛏️</span>
+          宿泊条件
+        </div>
+        <div class="stay-grid">
+          <div>
+            <div class="field-label" style="margin-bottom: 6px;">泊数</div>
+            <select id="nights" style="width: 100%;">
+              <option value="1" selected>1泊</option>
+              <option value="2">2泊</option>
+              <option value="3">3泊</option>
+              <option value="4">4泊</option>
+              <option value="5">5泊</option>
+            </select>
+          </div>
+          <div>
+            <div class="field-label" style="margin-bottom: 6px;">人数</div>
+            <select id="guests" style="width: 100%;">
+              <option value="1">大人1名</option>
+              <option value="2" selected>大人2名</option>
+              <option value="3">大人2名+子供1名</option>
+              <option value="4">大人2名+子供2名</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Button -->
+    <div class="container">
+      <button class="search-btn" id="searchBtn">🔍 最適なホテルを探す</button>
+    </div>
+  </div>
+
+  <!-- Results Screen -->
+  <div class="screen" id="resultsScreen">
+    <div class="results-header">
+      <h2 id="resultsTitle">📊 東京のおすすめホテル</h2>
+      <p class="results-subtitle" id="resultsSubtitle"></p>
+    </div>
+
+    <!-- Chain Filter -->
+    <div class="chain-filter" id="chainFilter">
+      <button class="filter-btn active" data-chain="all">すべて</button>
+      <button class="filter-btn marriott" data-chain="marriott">マリオット</button>
+      <button class="filter-btn hilton" data-chain="hilton">ヒルトン</button>
+      <button class="filter-btn hyatt" data-chain="hyatt">ハイアット</button>
+    </div>
+
+    <!-- Hotel Cards -->
+    <div id="hotelResults">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- Tips -->
+    <div class="tips-section" id="tipsSection">
+      <div class="tips-title">💡 注意点・裏技</div>
+      <div id="tipsContent">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer">
+      <div class="disclaimer-title">⚠️ ポイント数に関する注意</div>
+      表示されているポイント数は目安です。マリオット・ヒルトンはダイナミックプライシングを導入しており、実際の必要ポイント数は日程により大きく変動します。ハイアットはアワードチャートベースで比較的安定していますが、ピーク/オフピーク変動があります。正確なポイント数は各公式サイトでご確認ください。
+    </div>
+
+    <!-- Actions -->
+    <div class="actions-bar">
+      <button class="action-btn" id="backBtn">← 条件を変更</button>
+      <button class="action-btn" id="copyUrlBtn">🔗 URLをコピー</button>
+      <button class="action-btn primary" id="shareXBtn">𝕏 シェア</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>ホテルポイント最適化シミュレーター</p>
+    <p>データは2025年時点の公開情報に基づく目安です</p>
+    <p>正確な情報は各チェーン公式サイトをご確認ください</p>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ============================================================
+    // Data: Embedded from JSON files
+    // ============================================================
+    let hotelsData = null;
+    let benefitsData = null;
+
+    // State
+    const state = {
+      city: 'tokyo',
+      marriottStatus: 'チタン',
+      marriottPoints: 150000,
+      hiltonStatus: 'ダイヤモンド',
+      hiltonPoints: 200000,
+      hyattStatus: 'グローバリスト',
+      hyattPoints: 80000,
+      nights: 1,
+      guests: 2,
+      chainFilter: 'all'
+    };
+
+    // ============================================================
+    // Data Loading
+    // ============================================================
+    async function loadData() {
+      try {
+        const [hotelsRes, benefitsRes] = await Promise.all([
+          fetch('data/hotels.json'),
+          fetch('data/benefits.json')
+        ]);
+        hotelsData = await hotelsRes.json();
+        benefitsData = await benefitsRes.json();
+        initApp();
+      } catch (e) {
+        console.error('Failed to load data:', e);
+        document.body.innerHTML = '<div style="padding:40px;text-align:center;">データの読み込みに失敗しました。ページを再読み込みしてください。</div>';
+      }
+    }
+
+    // ============================================================
+    // Initialization
+    // ============================================================
+    function initApp() {
+      renderCityGrid();
+      loadFromURL();
+      setupEventListeners();
+    }
+
+    function renderCityGrid() {
+      const grid = document.getElementById('cityGrid');
+      const cities = Object.entries(hotelsData);
+      grid.innerHTML = cities.map(([key, city]) => {
+        const icons = { tokyo: '🗼', osaka: '🏯', hawaii: '🌺', seoul: '🇰🇷', bangkok: '🇹🇭', singapore: '🇸🇬' };
+        return `<button class="city-btn${state.city === key ? ' active' : ''}" data-city="${key}">${icons[key] || '📍'} ${city.name}</button>`;
+      }).join('');
+    }
+
+    function setupEventListeners() {
+      // City selection
+      document.getElementById('cityGrid').addEventListener('click', (e) => {
+        const btn = e.target.closest('.city-btn');
+        if (!btn) return;
+        document.querySelectorAll('.city-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.city = btn.dataset.city;
+      });
+
+      // Search button
+      document.getElementById('searchBtn').addEventListener('click', () => {
+        collectInputs();
+        showResults();
+      });
+
+      // Back button
+      document.getElementById('backBtn').addEventListener('click', () => {
+        document.getElementById('inputScreen').classList.add('active');
+        document.getElementById('resultsScreen').classList.remove('active');
+        window.scrollTo(0, 0);
+      });
+
+      // Chain filter
+      document.getElementById('chainFilter').addEventListener('click', (e) => {
+        const btn = e.target.closest('.filter-btn');
+        if (!btn) return;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.chainFilter = btn.dataset.chain;
+        renderResults();
+      });
+
+      // Copy URL
+      document.getElementById('copyUrlBtn').addEventListener('click', () => {
+        const url = buildShareURL();
+        navigator.clipboard.writeText(url).then(() => {
+          showToast('URLをコピーしました');
+        }).catch(() => {
+          showToast('コピーに失敗しました');
+        });
+      });
+
+      // Share to X
+      document.getElementById('shareXBtn').addEventListener('click', () => {
+        const url = buildShareURL();
+        const cityName = hotelsData[state.city].name;
+        const text = `${cityName}のホテルポイント最適化シミュレーション結果 🏨\n3チェーン横断で最もお得な宿泊先を比較しました！\n\n#ホテルポイント #子連れ旅ラボ`;
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+        window.open(twitterUrl, '_blank', 'width=550,height=420');
+      });
+
+      // Theme toggle
+      document.getElementById('themeToggle').addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        document.documentElement.setAttribute('data-theme', isDark ? '' : 'dark');
+        document.getElementById('themeToggle').textContent = isDark ? '🌙' : '☀️';
+        localStorage.setItem('theme', isDark ? 'light' : 'dark');
+      });
+
+      // Restore theme
+      if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.getElementById('themeToggle').textContent = '☀️';
+      }
+    }
+
+    function collectInputs() {
+      state.marriottStatus = document.getElementById('marriottStatus').value;
+      state.marriottPoints = parseInt(document.getElementById('marriottPoints').value) || 0;
+      state.hiltonStatus = document.getElementById('hiltonStatus').value;
+      state.hiltonPoints = parseInt(document.getElementById('hiltonPoints').value) || 0;
+      state.hyattStatus = document.getElementById('hyattStatus').value;
+      state.hyattPoints = parseInt(document.getElementById('hyattPoints').value) || 0;
+      state.nights = parseInt(document.getElementById('nights').value) || 1;
+      state.guests = parseInt(document.getElementById('guests').value) || 2;
+    }
+
+    // ============================================================
+    // Score Calculation
+    // ============================================================
+    function calculateScores(hotel) {
+      const pointsUnitScore = calcPointsUnitScore(hotel);
+      const statusBenefitScore = calcStatusBenefitScore(hotel);
+      const convenienceScore = calcConvenienceScore(hotel);
+
+      const total = Math.round(
+        pointsUnitScore * 0.4 +
+        statusBenefitScore * 0.35 +
+        convenienceScore * 0.25
+      );
+
+      return {
+        total: Math.min(total, 100),
+        pointsUnit: Math.round(pointsUnitScore),
+        statusBenefit: Math.round(statusBenefitScore),
+        convenience: Math.round(convenienceScore)
+      };
+    }
+
+    function calcPointsUnitScore(hotel) {
+      const cashMid = (hotel.cash_rate_min + hotel.cash_rate_max) / 2;
+      const pointsMid = (hotel.points_per_night_min + hotel.points_per_night_max) / 2;
+      const unitPrice = cashMid / pointsMid;
+
+      if (unitPrice >= 2.0) return 100;
+      if (unitPrice >= 1.5) return 80;
+      if (unitPrice >= 1.0) return 60;
+      if (unitPrice >= 0.7) return 40;
+      return 20;
+    }
+
+    function calcStatusBenefitScore(hotel) {
+      const chain = hotel.chain;
+      let userStatus;
+      if (chain === 'marriott') userStatus = state.marriottStatus;
+      else if (chain === 'hilton') userStatus = state.hiltonStatus;
+      else userStatus = state.hyattStatus;
+
+      const benefits = benefitsData[chain]?.benefits?.[userStatus];
+      if (!benefits) return 0;
+
+      let score = 0;
+
+      // Suite upgrade
+      if (benefits.suite_upgrade && hotel.features.suite_upgrade_likelihood !== 'none') {
+        score += 30;
+      }
+
+      // Breakfast
+      const breakfastStatuses = hotel.features.breakfast_included_status;
+      if (breakfastStatuses && breakfastStatuses.length > 0 && breakfastStatuses.includes(userStatus)) {
+        score += 30;
+      } else if (benefits.breakfast && benefits.breakfast.includes('全ブランド')) {
+        score += 30;
+      }
+
+      // Lounge
+      if (benefits.lounge_access && hotel.features.club_lounge) {
+        score += 20;
+      }
+
+      // Late checkout
+      if (benefits.late_checkout && benefits.late_checkout !== 'なし') {
+        score += 10;
+      }
+
+      // Parking
+      if (hotel.features.parking_free) {
+        score += 10;
+      }
+
+      return Math.min(score, 100);
+    }
+
+    function calcConvenienceScore(hotel) {
+      let score = 0;
+
+      // Location (station proximity)
+      if (hotel.station_minutes !== null) {
+        if (hotel.station_minutes <= 3) score += 40;
+        else if (hotel.station_minutes <= 7) score += 30;
+        else if (hotel.station_minutes <= 12) score += 20;
+        else score += 10;
+      } else {
+        // Hawaii etc, no station - neutral
+        score += 25;
+      }
+
+      // Room size
+      if (hotel.avg_room_size_sqm >= 45) score += 30;
+      else if (hotel.avg_room_size_sqm >= 35) score += 22;
+      else if (hotel.avg_room_size_sqm >= 28) score += 15;
+      else score += 8;
+
+      // Kid friendly
+      if (state.guests >= 3) {
+        if (hotel.kid_friendly) score += 20;
+        if (hotel.has_pool) score += 10;
+      } else {
+        if (hotel.has_pool) score += 15;
+        if (hotel.kid_friendly) score += 15;
+      }
+
+      return Math.min(score, 100);
+    }
+
+    // ============================================================
+    // Display Results
+    // ============================================================
+    function showResults() {
+      document.getElementById('inputScreen').classList.remove('active');
+      document.getElementById('resultsScreen').classList.add('active');
+      window.scrollTo(0, 0);
+      updateURL();
+      renderResults();
+      renderTips();
+    }
+
+    function renderResults() {
+      const cityData = hotelsData[state.city];
+      if (!cityData) return;
+
+      const cityName = cityData.name;
+      document.getElementById('resultsTitle').textContent = `📊 ${cityName}のおすすめホテル`;
+
+      const statusText = [
+        `マリオット:${state.marriottStatus}`,
+        `ヒルトン:${state.hiltonStatus}`,
+        `ハイアット:${state.hyattStatus}`
+      ].join(' / ');
+      document.getElementById('resultsSubtitle').textContent = `${state.nights}泊 ・ ${statusText}`;
+
+      let hotels = cityData.hotels.map(hotel => {
+        const scores = calculateScores(hotel);
+        return { ...hotel, scores };
+      });
+
+      // Sort by score
+      hotels.sort((a, b) => b.scores.total - a.scores.total);
+
+      // Filter by chain
+      if (state.chainFilter !== 'all') {
+        hotels = hotels.filter(h => h.chain === state.chainFilter);
+      }
+
+      const container = document.getElementById('hotelResults');
+      container.innerHTML = hotels.map((hotel, i) => renderHotelCard(hotel, i + 1)).join('');
+
+      // Animate score bars
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          document.querySelectorAll('.score-bar-fill').forEach(bar => {
+            bar.style.width = bar.dataset.width;
+          });
+        }, 100);
+      });
+
+      // Card expand toggle
+      container.querySelectorAll('.hotel-card-header').forEach(header => {
+        header.addEventListener('click', () => {
+          header.parentElement.classList.toggle('expanded');
+        });
+      });
+    }
+
+    function renderHotelCard(hotel, rank) {
+      const s = hotel.scores;
+      const chain = hotel.chain;
+      const chainLabel = { marriott: 'マリオット', hilton: 'ヒルトン', hyatt: 'ハイアット' }[chain];
+      const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-other';
+      const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+
+      const pointsMin = hotel.points_per_night_min * state.nights;
+      const pointsMax = hotel.points_per_night_max * state.nights;
+      const cashMin = hotel.cash_rate_min * state.nights;
+      const cashMax = hotel.cash_rate_max * state.nights;
+
+      const cashMid = (hotel.cash_rate_min + hotel.cash_rate_max) / 2;
+      const pointsMid = (hotel.points_per_night_min + hotel.points_per_night_max) / 2;
+      const unitPrice = (cashMid / pointsMid).toFixed(1);
+
+      // Check if user has enough points
+      let userPoints;
+      if (chain === 'marriott') userPoints = state.marriottPoints;
+      else if (chain === 'hilton') userPoints = state.hiltonPoints;
+      else userPoints = state.hyattPoints;
+      const canAfford = userPoints >= pointsMin;
+
+      const scoreColor = s.total >= 75 ? 'var(--score-high)' : s.total >= 50 ? 'var(--score-mid)' : 'var(--score-low)';
+
+      // Benefits for this user
+      const userStatus = chain === 'marriott' ? state.marriottStatus : chain === 'hilton' ? state.hiltonStatus : state.hyattStatus;
+      const benefits = benefitsData[chain]?.benefits?.[userStatus];
+
+      const breakfastStatuses = hotel.features.breakfast_included_status;
+      const hasBreakfast = (breakfastStatuses && breakfastStatuses.length > 0 && breakfastStatuses.includes(userStatus))
+        || (benefits && benefits.breakfast && benefits.breakfast.includes('全ブランド'));
+
+      const hasSuiteUpgrade = benefits?.suite_upgrade && hotel.features.suite_upgrade_likelihood !== 'none';
+      const hasLounge = benefits?.lounge_access && hotel.features.club_lounge;
+      const lateCheckout = hotel.features.late_checkout || (benefits?.late_checkout || 'なし');
+
+      const likelihoodMap = { high: '高', medium: '中', low: '低' };
+      const suiteText = hotel.features.suite_upgrade_likelihood ? likelihoodMap[hotel.features.suite_upgrade_likelihood] || '' : '';
+
+      return `
+        <div class="hotel-card animate-in" style="animation-delay: ${rank * 0.05}s">
+          <div class="hotel-card-header">
+            <div class="hotel-rank-row">
+              <div class="rank-badge ${rankClass}">${typeof rankIcon === 'number' ? rankIcon : ''}</div>
+              ${typeof rankIcon === 'string' ? `<span style="font-size:20px;margin-left:-6px">${rankIcon}</span>` : ''}
+              <div class="hotel-name">${hotel.name}</div>
+              <span class="chain-tag ${chain}">${chainLabel}</span>
+            </div>
+            <div class="hotel-metrics">
+              <div class="metric">
+                <span class="metric-icon">💰</span>
+                <span>目安: </span>
+                <span class="metric-value">${formatNumber(pointsMin)}〜${formatNumber(pointsMax)}pt</span>
+              </div>
+              <div class="metric">
+                <span class="metric-icon">💴</span>
+                <span>価格目安: </span>
+                <span class="metric-value">¥${formatNumber(cashMin)}〜${formatNumber(cashMax)}</span>
+              </div>
+              <div class="metric">
+                <span class="metric-icon">📈</span>
+                <span>単価目安: </span>
+                <span class="metric-value">${unitPrice}円/pt</span>
+              </div>
+              <div class="metric">
+                <span class="metric-icon">📍</span>
+                <span>${hotel.area}</span>
+                ${hotel.station_minutes ? `<span style="color:var(--text-secondary)">（駅徒歩${hotel.station_minutes}分）</span>` : ''}
+              </div>
+            </div>
+            ${!canAfford ? `<div class="not-enough-points">⚠️ ポイント残高が不足しています（必要: ${formatNumber(pointsMin)}pt〜）</div>` : ''}
+            <div class="score-bar-container">
+              <div style="font-size:12px;color:var(--text-secondary);min-width:60px;">お得度</div>
+              <div class="score-bar">
+                <div class="score-bar-fill" style="background: ${scoreColor};" data-width="${s.total}%"></div>
+              </div>
+              <div class="score-value" style="color: ${scoreColor};">${s.total}<span style="font-size:12px;font-weight:400">/100</span></div>
+            </div>
+            <span class="expand-icon">▼ 詳細</span>
+          </div>
+          <div class="hotel-details">
+            <div class="score-breakdown">
+              <div class="score-detail">
+                <div class="score-detail-label">ポイント単価</div>
+                <div class="score-detail-value">${s.pointsUnit}</div>
+              </div>
+              <div class="score-detail">
+                <div class="score-detail-label">特典スコア</div>
+                <div class="score-detail-value">${s.statusBenefit}</div>
+              </div>
+              <div class="score-detail">
+                <div class="score-detail-label">利便性</div>
+                <div class="score-detail-value">${s.convenience}</div>
+              </div>
+            </div>
+            <div class="benefits-grid">
+              ${hasSuiteUpgrade ? `<div class="benefit-item"><span class="benefit-check">✅</span> スイートアップグレード対象（確率: ${suiteText}）</div>` : `<div class="benefit-item"><span class="benefit-cross">❌</span> スイートアップグレード対象外</div>`}
+              ${hasBreakfast ? `<div class="benefit-item"><span class="benefit-check">✅</span> 朝食無料（${userStatus}特典）</div>` : `<div class="benefit-item"><span class="benefit-cross">❌</span> 朝食はステータス特典に含まれない</div>`}
+              ${hasLounge ? `<div class="benefit-item"><span class="benefit-check">✅</span> クラブラウンジアクセス</div>` : hotel.features.club_lounge ? `<div class="benefit-item"><span class="benefit-cross">❌</span> ラウンジあるがステータス不足</div>` : `<div class="benefit-item"><span style="color:var(--text-secondary)">ー</span> クラブラウンジなし</div>`}
+              <div class="benefit-item"><span style="font-size:16px">🕐</span> レイトチェックアウト: ${lateCheckout}</div>
+              ${hotel.features.parking_free ? `<div class="benefit-item"><span class="benefit-check">✅</span> 駐車場無料</div>` : ''}
+              ${hotel.has_pool ? `<div class="benefit-item"><span style="font-size:16px">🏊</span> プールあり</div>` : ''}
+            </div>
+            ${hotel.sho_comment ? `
+            <div class="sho-comment">
+              <div class="sho-comment-label">📝 Shoのコメント</div>
+              「${hotel.sho_comment}」
+            </div>` : ''}
+            <div class="points-warning">
+              <span>⚠️</span>
+              <span>ポイント数は目安です。実際の必要ポイント数は日程により変動します。</span>
+            </div>
+            <div style="margin-top:10px;">
+              <a href="${hotel.booking_url}" target="_blank" rel="noopener noreferrer" class="booking-link">🔗 公式サイトで正確な料金を確認 →</a>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTips() {
+      const tips = document.getElementById('tipsContent');
+      tips.innerHTML = `
+        <div class="tip-chain">
+          <div class="tip-chain-name" style="color:var(--marriott);">🔹 マリオット・ボンヴォイ</div>
+          <div class="tip-text">
+            リッツカールトン・セントレジス・エディション・ラグジュアリーコレクションは、ステータスによる朝食無料の対象外です。
+            ダイナミックプライシング導入済みのため、日程により必要ポイント数は大幅に変動します。
+            スイートナイトアワード（SNA）はプラチナ以上に年間付与されます。
+          </div>
+        </div>
+        <div class="tip-chain">
+          <div class="tip-chain-name" style="color:var(--hilton);">🔹 ヒルトン・オナーズ</div>
+          <div class="tip-text">
+            ダイヤモンドの朝食は全ブランド対象ですが上限金額があります（超過分は自費）。
+            レイトチェックアウトは保証ではなくリクエストベースです。
+            ダイナミックプライシング導入済みです。
+          </div>
+        </div>
+        <div class="tip-chain">
+          <div class="tip-chain-name" style="color:var(--hyatt);">🔹 ワールドオブハイアット</div>
+          <div class="tip-text">
+            グローバリストの朝食無料は全ブランド対象・金額上限なし（3チェーン中最強）。
+            レイトチェックアウト16時は保証（他チェーンにない強み）。
+            スイートアップグレードアワード: 40泊で1つ、50泊で2つ選択可、60泊で自動2つ。
+            ライフタイムグローバリストは年4つ自動付与。チェックイン時の空室ベースアップグレードとは別枠。
+          </div>
+        </div>
+      `;
+    }
+
+    // ============================================================
+    // URL Parameters (Share)
+    // ============================================================
+    function buildShareURL() {
+      const params = new URLSearchParams();
+      params.set('city', state.city);
+      params.set('ms', state.marriottStatus);
+      params.set('mp', state.marriottPoints);
+      params.set('hs', state.hiltonStatus);
+      params.set('hp', state.hiltonPoints);
+      params.set('ys', state.hyattStatus);
+      params.set('yp', state.hyattPoints);
+      params.set('n', state.nights);
+      params.set('g', state.guests);
+      return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+    }
+
+    function updateURL() {
+      const url = buildShareURL();
+      history.replaceState(null, '', url);
+    }
+
+    function loadFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      if (!params.has('city')) return;
+
+      const city = params.get('city');
+      if (hotelsData[city]) {
+        state.city = city;
+        document.querySelectorAll('.city-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.city === city);
+        });
+      }
+
+      if (params.has('ms')) {
+        state.marriottStatus = params.get('ms');
+        document.getElementById('marriottStatus').value = state.marriottStatus;
+      }
+      if (params.has('mp')) {
+        state.marriottPoints = parseInt(params.get('mp')) || 0;
+        document.getElementById('marriottPoints').value = state.marriottPoints;
+      }
+      if (params.has('hs')) {
+        state.hiltonStatus = params.get('hs');
+        document.getElementById('hiltonStatus').value = state.hiltonStatus;
+      }
+      if (params.has('hp')) {
+        state.hiltonPoints = parseInt(params.get('hp')) || 0;
+        document.getElementById('hiltonPoints').value = state.hiltonPoints;
+      }
+      if (params.has('ys')) {
+        state.hyattStatus = params.get('ys');
+        document.getElementById('hyattStatus').value = state.hyattStatus;
+      }
+      if (params.has('yp')) {
+        state.hyattPoints = parseInt(params.get('yp')) || 0;
+        document.getElementById('hyattPoints').value = state.hyattPoints;
+      }
+      if (params.has('n')) {
+        state.nights = parseInt(params.get('n')) || 1;
+        document.getElementById('nights').value = state.nights;
+      }
+      if (params.has('g')) {
+        state.guests = parseInt(params.get('g')) || 2;
+        document.getElementById('guests').value = state.guests;
+      }
+
+      // Auto-show results if URL params present
+      collectInputs();
+      showResults();
+    }
+
+    // ============================================================
+    // Utility
+    // ============================================================
+    function formatNumber(n) {
+      return n.toLocaleString('ja-JP');
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // ============================================================
+    // Boot
+    // ============================================================
+    loadData();
+  </script>
+</body>
+</html>
