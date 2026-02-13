@@ -1,0 +1,165 @@
+{
+  "marriott": {
+    "name": "マリオット・ボンヴォイ",
+    "statuses": ["一般", "シルバー", "ゴールド", "プラチナ", "チタン", "アンバサダー"],
+    "benefits": {
+      "一般": {
+        "suite_upgrade": false,
+        "breakfast": "なし",
+        "late_checkout": "なし",
+        "lounge_access": false,
+        "welcome_gift": "なし",
+        "room_upgrade": "なし",
+        "point_bonus_percent": 0
+      },
+      "シルバー": {
+        "suite_upgrade": false,
+        "breakfast": "なし",
+        "late_checkout": "14:00（リクエストベース）",
+        "lounge_access": false,
+        "welcome_gift": "なし",
+        "room_upgrade": "同カテゴリ内アップグレード",
+        "point_bonus_percent": 10
+      },
+      "ゴールド": {
+        "suite_upgrade": false,
+        "breakfast": "なし（一部ブランドでウェルカムギフト選択あり）",
+        "late_checkout": "14:00",
+        "lounge_access": false,
+        "welcome_gift": "ポイント250〜500pt or ギフト",
+        "room_upgrade": "同カテゴリ内空室アップグレード",
+        "point_bonus_percent": 25
+      },
+      "プラチナ": {
+        "suite_upgrade": true,
+        "breakfast": "対象ブランドで無料（リッツ・セントレジス・エディション等は対象外）",
+        "late_checkout": "16:00",
+        "lounge_access": true,
+        "welcome_gift": "ポイント1,000pt or アメニティ or 朝食選択",
+        "room_upgrade": "スイート含む空室アップグレード",
+        "point_bonus_percent": 50
+      },
+      "チタン": {
+        "suite_upgrade": true,
+        "breakfast": "対象ブランドで無料（リッツ・セントレジス・エディション等は対象外）",
+        "late_checkout": "16:00",
+        "lounge_access": true,
+        "welcome_gift": "ポイント1,000pt or アメニティ or 朝食選択",
+        "room_upgrade": "スイート含む空室アップグレード",
+        "point_bonus_percent": 75
+      },
+      "アンバサダー": {
+        "suite_upgrade": true,
+        "breakfast": "対象ブランドで無料（リッツ・セントレジス・エディション等は対象外）",
+        "late_checkout": "Your24（好きな時間にチェックイン/アウト）",
+        "lounge_access": true,
+        "welcome_gift": "Your24 + アンバサダーサービス",
+        "room_upgrade": "アンバサダーサービスによる手配",
+        "point_bonus_percent": 75
+      }
+    },
+    "notes": [
+      "リッツカールトン・セントレジス・エディション・ラグジュアリーコレクション等のラグジュアリーブランドは、ステータスによる朝食無料の対象外です",
+      "ダイナミックプライシング導入済み：必要ポイントは日程により大幅に変動します",
+      "スイートナイトアワード（SNA）はプラチナ以上に年間付与され、事前にスイートを確保できます"
+    ]
+  },
+  "hilton": {
+    "name": "ヒルトン・オナーズ",
+    "statuses": ["一般", "シルバー", "ゴールド", "ダイヤモンド"],
+    "benefits": {
+      "一般": {
+        "suite_upgrade": false,
+        "breakfast": "なし",
+        "late_checkout": "なし",
+        "lounge_access": false,
+        "welcome_gift": "なし",
+        "room_upgrade": "なし",
+        "point_bonus_percent": 0
+      },
+      "シルバー": {
+        "suite_upgrade": false,
+        "breakfast": "なし",
+        "late_checkout": "なし",
+        "lounge_access": false,
+        "welcome_gift": "なし",
+        "room_upgrade": "同カテゴリ内アップグレード",
+        "point_bonus_percent": 20
+      },
+      "ゴールド": {
+        "suite_upgrade": false,
+        "breakfast": "全ブランド対象で無料（上限金額あり）",
+        "late_checkout": "リクエストベース",
+        "lounge_access": false,
+        "welcome_gift": "なし",
+        "room_upgrade": "同カテゴリ内空室アップグレード",
+        "point_bonus_percent": 80
+      },
+      "ダイヤモンド": {
+        "suite_upgrade": true,
+        "breakfast": "全ブランド対象で無料（上限金額あり）",
+        "late_checkout": "リクエストベース（保証なし）",
+        "lounge_access": true,
+        "welcome_gift": "ポイント or 朝食 or アメニティ",
+        "room_upgrade": "1ベッドルームスイート含む空室アップグレード",
+        "point_bonus_percent": 100
+      }
+    },
+    "notes": [
+      "ヒルトンは全ブランドでゴールド以上の朝食が対象（ただし上限金額あり、超過分は自費）",
+      "ダイヤモンドのレイトチェックアウトは保証ではなくリクエストベースです",
+      "ダイナミックプライシング導入済み：必要ポイントは日程により大幅に変動します",
+      "ポイント単価の目安は0.4〜0.6円/ptが一般的。高級ホテルほどお得になりやすい"
+    ]
+  },
+  "hyatt": {
+    "name": "ワールドオブハイアット",
+    "statuses": ["一般", "ディスカバリスト", "エクスプローリスト", "グローバリスト"],
+    "benefits": {
+      "一般": {
+        "suite_upgrade": false,
+        "breakfast": "なし",
+        "late_checkout": "なし",
+        "lounge_access": false,
+        "welcome_gift": "なし",
+        "room_upgrade": "なし",
+        "point_bonus_percent": 0
+      },
+      "ディスカバリスト": {
+        "suite_upgrade": false,
+        "breakfast": "なし",
+        "late_checkout": "14:00（リクエストベース）",
+        "lounge_access": false,
+        "welcome_gift": "ウォーターボトル",
+        "room_upgrade": "同カテゴリ内アップグレード",
+        "point_bonus_percent": 10
+      },
+      "エクスプローリスト": {
+        "suite_upgrade": false,
+        "breakfast": "なし",
+        "late_checkout": "14:00",
+        "lounge_access": false,
+        "welcome_gift": "アメニティ",
+        "room_upgrade": "プレミアムルームアップグレード",
+        "point_bonus_percent": 20
+      },
+      "グローバリスト": {
+        "suite_upgrade": true,
+        "breakfast": "全ブランド対象で無料",
+        "late_checkout": "16:00（保証）",
+        "lounge_access": true,
+        "welcome_gift": "アメニティ",
+        "room_upgrade": "スイート含む空室アップグレード",
+        "point_bonus_percent": 30
+      }
+    },
+    "notes": [
+      "ハイアットはアワードチャートベースのため、必要ポイントが比較的安定しています（ピーク/オフピークの変動あり）",
+      "グローバリストの朝食無料は全ブランド対象で、金額上限もありません",
+      "レイトチェックアウト16時は保証（他チェーンにない強み）",
+      "スイートアップグレードアワード：マイルストーンリワードで獲得可能（40泊で1つ、50泊で2つ選択可、60泊で自動2つ）",
+      "ライフタイムグローバリストは年間4つのスイートアップグレードアワードが自動付与",
+      "チェックイン時の空室ベースアップグレードとスイートアップグレードアワードは別枠"
+    ]
+  }
+}
